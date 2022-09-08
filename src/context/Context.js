@@ -47,11 +47,11 @@ const AuthProvider = ({ children }) => {
   const logOut = () => {
     signOut(auth)
       .then(() => {
-        console.log("Logout successfull");
+        // console.log("Logout successfull");
         setAuthData(null);
       })
       .catch((e) => {
-        console.log(e);
+        // console.log(e);
       });
   };
 
@@ -60,7 +60,7 @@ const AuthProvider = ({ children }) => {
     onAuthStateChanged(auth, (currentUser) => {
       setAuthData(currentUser);
       setLoading(false);
-      console.log(currentUser);
+      // console.log(currentUser);
     });
     return () => {};
   }, [auth]);

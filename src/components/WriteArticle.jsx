@@ -1,5 +1,5 @@
 import { Formik, Field, Form } from "formik";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/Context";
 import WriteArticleValidation from "../validations/writeArticle.validation";
 import { doc, collection, serverTimestamp, setDoc } from "firebase/firestore";
@@ -7,6 +7,8 @@ import { db } from "../Firebase";
 // import { ref, uploadBytes } from "firebase/storage";
 const WriteArticle = () => {
   const { authData } = useContext(AuthContext);
+
+  const [postedArticle, setPostedArticle] = useState(false);
 
   // const [uploadedImageUrl, setUploadedImageUrl] = useState("");
 
@@ -34,9 +36,10 @@ const WriteArticle = () => {
       author: authData?.displayName,
       author_image: authData?.photoURL,
     });
-    console.log(values);
+    // console.log(values);
     resetForm();
-    console.log("Article posted");
+    setPostedArticle(true);
+    // console.log("Article posted");
   };
 
   useEffect(() => {
@@ -46,6 +49,9 @@ const WriteArticle = () => {
 
   return (
     <div className="w-full max-w-[40rem] mx-auto px-6 py-10 h-full mt-20">
+      {postedArticle && (
+        <p className="font-semibold text-xl mb-10">Posted Successfully</p>
+      )}
       <h2 className="font-semibold text-xl mb-10 text-center underline">
         Lets get Started writing an article
       </h2>
@@ -54,7 +60,7 @@ const WriteArticle = () => {
           initialValues={initialValues}
           validationSchema={WriteArticleValidation}
           onSubmit={(values, { resetForm }) => {
-            console.log(values);
+            // console.log(values);
             postArticle(values, resetForm);
           }}
         >

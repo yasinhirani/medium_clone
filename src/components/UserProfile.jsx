@@ -13,7 +13,7 @@ const UserProfile = () => {
     articles &&
     articles.filter((article) => article.data.author === authData?.displayName);
 
-  console.log(myArticles);
+  // console.log(myArticles);
 
   useEffect(() => {
     window.scrollTo(0, 0);

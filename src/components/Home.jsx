@@ -5,7 +5,7 @@ import Post from "./Post";
 
 const Home = () => {
   const { articles, articlesLoading } = useContext(MediumContext);
-  console.log(articles);
+  // console.log(articles);
   const articleRef = useRef(null);
   const goToArticle = () => {
     articleRef.current.scrollIntoView({ behavior: "smooth" });

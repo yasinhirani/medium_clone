@@ -33,7 +33,7 @@ const PostDetails = () => {
   const filterArticle =
     articles && articles.filter((article) => articleId.id === article.id);
 
-  console.log(filterArticle);
+  // console.log(filterArticle);
 
   const newDate =
     filterArticle[0] &&
@@ -46,7 +46,7 @@ const PostDetails = () => {
     );
 
   const getComments = async () => {
-    console.log(articleId.id);
+    // console.log(articleId.id);
     onSnapshot(
       query(
         collection(db, `articles/${articleId.id}/comments`),
@@ -54,7 +54,7 @@ const PostDetails = () => {
       ),
       (snapshot) => {
         setComments(snapshot.docs.map((doc) => doc.data()));
-        console.log(snapshot.docs.map((doc) => doc.data()));
+        // console.log(snapshot.docs.map((doc) => doc.data()));
       }
     );
   };
@@ -62,7 +62,7 @@ const PostDetails = () => {
   const newComment = doc(collection(db, `articles/${articleId.id}/comments`));
 
   const handleCommentSubmit = async (values, resetForm) => {
-    console.log(values);
+    // console.log(values);
     resetForm();
     await setDoc(newComment, {
       ...values,

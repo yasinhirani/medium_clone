@@ -22,7 +22,7 @@ const Post = ({
   const location = useLocation();
 
   const deleteArticle = async (articleId) => {
-    console.log(articleId);
+    // console.log(articleId);
     await deleteDoc(doc(db, "articles", articleId));
   };
   return (
