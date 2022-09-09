@@ -21,7 +21,7 @@ const UserProfile = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-[45rem] mx-auto px-6 py-4 mt-16">
+    <div className="w-full max-w-[45rem] mx-auto px-6 py-6 mt-16">
       <div className="flex flex-col items-center my-10">
         <figure className="border-4 border-gray-300 inline-block rounded-full overflow-hidden">
           <img src={authData?.photoURL} alt="" />
