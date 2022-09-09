@@ -10,10 +10,6 @@ const ProtectedRoute = ({ Component }) => {
       navigate("/");
     }
   });
-  return (
-    <div>
-      <Component />
-    </div>
-  );
+  return <Component />;
 };
 export default ProtectedRoute;

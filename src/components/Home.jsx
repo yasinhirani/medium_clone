@@ -1,4 +1,5 @@
 import { useContext, useRef } from "react";
+import { Link } from "react-router-dom";
 import { MediumContext } from "../context/Context";
 import Banner from "./Banner";
 import Post from "./Post";
@@ -18,6 +19,19 @@ const Home = () => {
         ref={articleRef}
       >
         {articlesLoading && <p>Loading...</p>}
+        {articles.length === 0 && !articlesLoading && (
+          <div>
+            <p className="font-semibold text-3xl">
+              No one has posted any article yet...
+            </p>
+            <p className="font-semibold text-lg mt-4">
+              Be the first one to post an article.
+              <Link to="/writeArticle" className="underline ml-1">
+                Start writing
+              </Link>
+            </p>
+          </div>
+        )}
         {articles &&
           !articlesLoading &&
           articles.map((article) => (

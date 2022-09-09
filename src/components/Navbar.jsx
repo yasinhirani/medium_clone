@@ -27,7 +27,7 @@ const Navbar = () => {
           location.pathname.includes("profile")
             ? "bg-white"
             : "bg-[#ffc017]"
-        } h-20 border-b border-black fixed top-0 flex items-center`}
+        } h-20 border-b border-black fixed top-0 flex items-center z-10`}
       >
         <div className="w-full max-w-[80rem] mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/">

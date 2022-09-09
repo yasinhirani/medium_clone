@@ -1,14 +1,26 @@
 import { Formik, Field, Form } from "formik";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/Context";
 import WriteArticleValidation from "../validations/writeArticle.validation";
 import { doc, collection, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "../Firebase";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // import { ref, uploadBytes } from "firebase/storage";
 const WriteArticle = () => {
   const { authData } = useContext(AuthContext);
 
-  const [postedArticle, setPostedArticle] = useState(false);
+  // const [postedArticle, setPostedArticle] = useState(false);
+
+  const toastConfig = {
+    position: "top-right",
+    autoClose: 2000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: false,
+    progress: undefined,
+  };
 
   // const [uploadedImageUrl, setUploadedImageUrl] = useState("");
 
@@ -16,6 +28,7 @@ const WriteArticle = () => {
     title: "",
     sub_title: "",
     content: "",
+    post_image: "",
     category: "",
   };
 
@@ -38,7 +51,8 @@ const WriteArticle = () => {
     });
     // console.log(values);
     resetForm();
-    setPostedArticle(true);
+    // setPostedArticle(true);
+    toast.success("Posted Successfully", toastConfig);
     // console.log("Article posted");
   };
 
@@ -49,9 +63,6 @@ const WriteArticle = () => {
 
   return (
     <div className="w-full max-w-[40rem] mx-auto px-6 py-10 h-full mt-20">
-      {postedArticle && (
-        <p className="font-semibold text-xl mb-10">Posted Successfully</p>
-      )}
       <h2 className="font-semibold text-xl mb-10 text-center underline">
         Lets get Started writing an article
       </h2>
@@ -168,6 +179,7 @@ const WriteArticle = () => {
           }}
         </Formik>
       </div>
+      <ToastContainer />
     </div>
   );
 };
