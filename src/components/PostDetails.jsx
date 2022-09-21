@@ -140,7 +140,22 @@ const PostDetails = () => {
               loading="lazy"
             />
           </figure>
-          <p className="text-lg leading-8">{filterArticle[0]?.data.content}</p>
+          <div className="space-y-5">
+            {filterArticle[0]?.data.content &&
+              filterArticle[0]?.data.content.map((dataContent) => {
+                return (
+                  <p
+                    key={Math.random()}
+                    className={`text-base leading-8 ${dataContent.style} ${
+                      dataContent.style === "italic" &&
+                      "border-l-2 border-gray-400 pl-4"
+                    }`}
+                  >
+                    {dataContent.contentText}
+                  </p>
+                );
+              })}
+          </div>
           <div className="mt-5">
             <h4 className="text-2xl font-semibold mb-5">Comments</h4>
             {authData !== null && (

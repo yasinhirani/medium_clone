@@ -1,4 +1,4 @@
-import { Formik, Field, Form } from "formik";
+import { Formik, Field, Form, FieldArray } from "formik";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/Context";
 import WriteArticleValidation from "../validations/writeArticle.validation";
@@ -6,9 +6,15 @@ import { doc, collection, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "../Firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRef } from "react";
+import { useState } from "react";
 // import { ref, uploadBytes } from "firebase/storage";
 const WriteArticle = () => {
   const { authData } = useContext(AuthContext);
+
+  const [selectedStyle, setSelectedStyle] = useState([]);
+
+  const buttonRef = useRef(null);
 
   // const [postedArticle, setPostedArticle] = useState(false);
 
@@ -27,7 +33,7 @@ const WriteArticle = () => {
   const initialValues = {
     title: "",
     sub_title: "",
-    content: "",
+    content: [{ style: "", contentText: "" }],
     post_image: "",
     category: "",
   };
@@ -51,6 +57,7 @@ const WriteArticle = () => {
     });
     // console.log(values);
     resetForm();
+    setSelectedStyle([]);
     // setPostedArticle(true);
     toast.success("Posted Successfully", toastConfig);
     // console.log("Article posted");
@@ -70,12 +77,13 @@ const WriteArticle = () => {
         <Formik
           initialValues={initialValues}
           validationSchema={WriteArticleValidation}
+          validateOnChange={false}
           onSubmit={(values, { resetForm }) => {
             // console.log(values);
             postArticle(values, resetForm);
           }}
         >
-          {({ errors }) => {
+          {({ errors, values, setFieldValue }) => {
             return (
               <Form autoComplete="off">
                 <div className="flex flex-col space-y-1 relative">
@@ -127,16 +135,116 @@ const WriteArticle = () => {
                   <label className="font-semibold text-base" htmlFor="content">
                     Content
                   </label>
-                  <Field
-                    className="border-2 border-gray-400 focus:outline-none px-2 py-1 rounded-md"
-                    as="textarea"
-                    rows={5}
-                    name="content"
-                    id="content"
-                  />
-                  <p className="text-sm text-red-600 font-semibold">
-                    {errors.content}
-                  </p>
+                  <FieldArray name="content">
+                    {({ push, remove }) => {
+                      return (
+                        <div className="flex flex-col space-y-0">
+                          {values.content.length > 0 &&
+                            values.content.map((contentField, index) => (
+                              <div key={index} className="flex flex-col">
+                                <button
+                                  className={`${
+                                    index === 0 && "hidden"
+                                  } text-3xl mb-2 w-20 text-right self-end`}
+                                  onClick={() => {
+                                    remove(index);
+                                  }}
+                                >
+                                  -
+                                </button>
+                                <div className="flex justify-between items-start space-x-3">
+                                  <div className="flex flex-col flex-grow">
+                                    <Field
+                                      className="border-2 border-gray-400 focus:outline-none px-2 py-1 rounded-md w-full"
+                                      as="textarea"
+                                      rows={4}
+                                      name={`content[${index}].contentText`}
+                                      id={`content[${index}]`}
+                                    />
+                                    <p className="text-sm text-red-600 font-semibold">
+                                      {errors.content &&
+                                        errors.content[index]?.contentText}
+                                    </p>
+                                  </div>
+                                  <div className="flex flex-col space-y-2">
+                                    <button
+                                      type="button"
+                                      className={`italic text-lg px-3 py-0.5 rounded-md ${
+                                        selectedStyle[index] === "italic" &&
+                                        "bg-black bg-opacity-90 text-white"
+                                      }`}
+                                      onClick={() => {
+                                        setFieldValue(
+                                          `content[${index}.style]`,
+                                          "italic"
+                                        );
+                                        setSelectedStyle((prev) => {
+                                          return [...prev, "italic"];
+                                        });
+                                      }}
+                                    >
+                                      i
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className={`font-bold text-lg px-3 py-0.5 rounded-md ${
+                                        selectedStyle[index] === "bold" &&
+                                        "bg-black bg-opacity-90 text-white"
+                                      }`}
+                                      onClick={() => {
+                                        setFieldValue(
+                                          `content[${index}.style]`,
+                                          "font-bold"
+                                        );
+                                        setSelectedStyle((prev) => {
+                                          return [...prev, "bold"];
+                                        });
+                                      }}
+                                    >
+                                      B
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className={`underline text-lg px-3 py-0.5 rounded-md ${
+                                        selectedStyle[index] === "underline" &&
+                                        "bg-black bg-opacity-90 text-white"
+                                      }`}
+                                      onClick={() => {
+                                        setFieldValue(
+                                          `content[${index}.style]`,
+                                          "underline"
+                                        );
+                                        setSelectedStyle((prev) => {
+                                          return [...prev, "underline"];
+                                        });
+                                      }}
+                                    >
+                                      U
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          <button
+                            type="button"
+                            ref={buttonRef}
+                            onClick={() => {
+                              push("");
+                            }}
+                          />
+                        </div>
+                      );
+                    }}
+                  </FieldArray>
+                  <button
+                    type="button"
+                    className="w-40 text-left"
+                    onClick={() => {
+                      buttonRef.current && buttonRef.current.click();
+                    }}
+                  >
+                    + Add more content
+                  </button>
                 </div>
                 <div className="flex flex-col space-y-1 relative mt-6">
                   <label
