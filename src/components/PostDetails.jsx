@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   orderBy,
@@ -59,13 +60,17 @@ const PostDetails = () => {
 
   const getComments = async () => {
     // console.log(articleId.id);
-    onSnapshot(
+    await onSnapshot(
       query(
         collection(db, `articles/${articleId.id}/comments`),
         orderBy("date", "desc")
       ),
       (snapshot) => {
-        setComments(snapshot.docs.map((doc) => doc.data()));
+        setComments(
+          snapshot.docs.map((doc) => {
+            return { id: doc.id, commentsArray: doc.data() };
+          })
+        );
         // console.log(snapshot.docs.map((doc) => doc.data()));
       }
     );
@@ -77,12 +82,19 @@ const PostDetails = () => {
     // console.log(values);
     await setDoc(newComment, {
       ...values,
-      image: authData.photoURL,
-      name: authData.displayName,
+      image: authData.isAnonymous ? "" : authData.photoURL,
+      name: authData.isAnonymous
+        ? `Anonymous${authData.uid.slice(0, 4)}`
+        : authData.displayName,
       date: serverTimestamp(),
     });
     toast.success("Commented", toastConfig);
     resetForm();
+  };
+
+  const deleteComment = async (commentId) => {
+    // console.log(commentId);
+    await deleteDoc(doc(db, `articles/${articleId.id}/comments/${commentId}`));
   };
 
   useEffect(() => {
@@ -200,15 +212,48 @@ const PostDetails = () => {
                 return (
                   <div
                     key={Math.random()}
-                    className="flex items-start space-x-3 mt-5"
+                    className="flex justify-between items-start space-x-3 mt-5"
                   >
-                    <figure className="w-6 h-6 rounded-full overflow-hidden">
-                      <img src={comment.image} alt="" />
-                    </figure>
-                    <div>
-                      <h6 className="font-semibold">{comment.name}</h6>
-                      <p>{comment.comment}</p>
+                    <div className="flex items-start space-x-3">
+                      {comment.commentsArray.image !== "" && (
+                        <figure className="w-6 h-6 rounded-full overflow-hidden bg-gray-300 flex justify-center items-center">
+                          <img src={comment.commentsArray.image} alt="" />
+                        </figure>
+                      )}
+                      {comment.commentsArray.image === "" && (
+                        <p className="w-6 h-6 rounded-full overflow-hidden bg-gray-300 flex justify-center items-center">
+                          A
+                        </p>
+                      )}
+                      <div>
+                        <h6 className="font-semibold">
+                          {comment.commentsArray.name}
+                        </h6>
+                        <p>{comment.commentsArray.comment}</p>
+                      </div>
                     </div>
+                    {authData.displayName === filterArticle[0]?.data.author && (
+                      <button
+                        onClick={() => {
+                          deleteComment(comment.id);
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          className="w-4 sm:w-5 text-red-600"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                          />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                 );
               })}
