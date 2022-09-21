@@ -7,12 +7,9 @@ import { db } from "../Firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRef } from "react";
-import { useState } from "react";
 // import { ref, uploadBytes } from "firebase/storage";
 const WriteArticle = () => {
   const { authData } = useContext(AuthContext);
-
-  const [selectedStyle, setSelectedStyle] = useState([]);
 
   const buttonRef = useRef(null);
 
@@ -57,7 +54,7 @@ const WriteArticle = () => {
     });
     // console.log(values);
     resetForm();
-    setSelectedStyle([]);
+    // setSelectedStyle([]);
     // setPostedArticle(true);
     toast.success("Posted Successfully", toastConfig);
     // console.log("Article posted");
@@ -155,7 +152,7 @@ const WriteArticle = () => {
                                 <div className="flex justify-between items-start space-x-3">
                                   <div className="flex flex-col flex-grow">
                                     <Field
-                                      className="border-2 border-gray-400 focus:outline-none px-2 py-1 rounded-md w-full"
+                                      className={`border-2 border-gray-400 focus:outline-none px-2 py-1 rounded-md w-full ${values.content[index].style}`}
                                       as="textarea"
                                       rows={4}
                                       name={`content[${index}].contentText`}
@@ -170,7 +167,8 @@ const WriteArticle = () => {
                                     <button
                                       type="button"
                                       className={`italic text-lg px-3 py-0.5 rounded-md ${
-                                        selectedStyle[index] === "italic" &&
+                                        values.content[index].style ===
+                                          "italic" &&
                                         "bg-black bg-opacity-90 text-white"
                                       }`}
                                       onClick={() => {
@@ -178,9 +176,6 @@ const WriteArticle = () => {
                                           `content[${index}.style]`,
                                           "italic"
                                         );
-                                        setSelectedStyle((prev) => {
-                                          return [...prev, "italic"];
-                                        });
                                       }}
                                     >
                                       i
@@ -188,7 +183,8 @@ const WriteArticle = () => {
                                     <button
                                       type="button"
                                       className={`font-bold text-lg px-3 py-0.5 rounded-md ${
-                                        selectedStyle[index] === "bold" &&
+                                        values.content[index].style ===
+                                          "font-bold" &&
                                         "bg-black bg-opacity-90 text-white"
                                       }`}
                                       onClick={() => {
@@ -196,9 +192,6 @@ const WriteArticle = () => {
                                           `content[${index}.style]`,
                                           "font-bold"
                                         );
-                                        setSelectedStyle((prev) => {
-                                          return [...prev, "bold"];
-                                        });
                                       }}
                                     >
                                       B
@@ -206,7 +199,8 @@ const WriteArticle = () => {
                                     <button
                                       type="button"
                                       className={`underline text-lg px-3 py-0.5 rounded-md ${
-                                        selectedStyle[index] === "underline" &&
+                                        values.content[index].style ===
+                                          "underline" &&
                                         "bg-black bg-opacity-90 text-white"
                                       }`}
                                       onClick={() => {
@@ -214,9 +208,6 @@ const WriteArticle = () => {
                                           `content[${index}.style]`,
                                           "underline"
                                         );
-                                        setSelectedStyle((prev) => {
-                                          return [...prev, "underline"];
-                                        });
                                       }}
                                     >
                                       U
