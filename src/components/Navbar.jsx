@@ -54,9 +54,17 @@ const Navbar = () => {
                 <Menu as="div" className="relative inline-block text-left">
                   <div>
                     <Menu.Button className="flex w-full justify-center items-center rounded-md text-sm font-medium text-white focus:outline-none">
-                      <figure className="w-8 h-8 rounded-full overflow-hidden">
-                        <img src={authData?.photoURL} alt="" />
-                      </figure>
+                      {!authData.isAnonymous && (
+                        <figure className="w-8 h-8 rounded-full overflow-hidden">
+                          <img src={authData?.photoURL} alt="" />
+                        </figure>
+                      )}
+                      {authData.isAnonymous && (
+                        <span className="text-black">{`Anonymous${authData?.uid.slice(
+                          0,
+                          4
+                        )}`}</span>
+                      )}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -83,16 +91,18 @@ const Navbar = () => {
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 mt-2 w-36 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Menu.Item>
-                        <Link className="block" to="/writeArticle">
-                          <button
-                            className="w-full text-left px-3 py-2"
-                            type="button"
-                          >
-                            Start Writing
-                          </button>
-                        </Link>
-                      </Menu.Item>
+                      {!authData.isAnonymous && (
+                        <Menu.Item>
+                          <Link className="block" to="/writeArticle">
+                            <button
+                              className="w-full text-left px-3 py-2"
+                              type="button"
+                            >
+                              Start Writing
+                            </button>
+                          </Link>
+                        </Menu.Item>
+                      )}
                       <Menu.Item>
                         <Link
                           to={`/profile/${

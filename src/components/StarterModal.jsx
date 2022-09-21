@@ -1,6 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInAnonymously,
+  signInWithRedirect,
+} from "firebase/auth";
 const StarterModal = ({ isModalOpen, closeModal }) => {
   // Google login
   const auth = getAuth();
@@ -16,6 +21,13 @@ const StarterModal = ({ isModalOpen, closeModal }) => {
     //     console.log(e);
     //   });
     signInWithRedirect(auth, provider);
+  };
+
+  const loginAnonymously = () => {
+    signInAnonymously(auth).then((user) => {
+      console.log(user);
+      closeModal(false);
+    });
   };
 
   return (
@@ -57,7 +69,7 @@ const StarterModal = ({ isModalOpen, closeModal }) => {
                     X
                   </button>
                 </div>
-                <div className="flex justify-center">
+                <div className="flex flex-col items-center justify-center space-y-5">
                   <div>
                     <button
                       className="border border-gray-600 rounded-full p-3 flex items-center space-x-4"
@@ -68,6 +80,22 @@ const StarterModal = ({ isModalOpen, closeModal }) => {
                       </figure>
                       <span>Contiue With Google</span>
                     </button>
+                  </div>
+                  <div className="flex flex-col items-center space-y-2">
+                    <button
+                      className="border border-gray-600 rounded-full p-3 flex items-center space-x-4"
+                      onClick={loginAnonymously}
+                    >
+                      <figure className="w-6">
+                        <img src="/images/incognito_logo.png" alt="" />
+                      </figure>
+                      <span>Login Anonymously</span>
+                    </button>
+                    <p className="text-xs w-52">
+                      You won't be able to post anything from anonymous account
+                      and once logout you won't be able to access this account
+                      again.
+                    </p>
                   </div>
                 </div>
               </Dialog.Panel>

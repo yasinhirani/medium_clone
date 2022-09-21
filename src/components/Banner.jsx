@@ -19,7 +19,7 @@ const Banner = ({ goToArticle }) => {
             >
               Start reading
             </button>
-            {authData !== null && (
+            {authData !== null && !authData.isAnonymous && (
               <Link to="/writeArticle" className="w-52">
                 <button className="bg-black text-white rounded-3xl text-xl font-medium px-8 py-1.5 bg-opacity-90 hover:bg-opacity-100 w-full">
                   Start writing
