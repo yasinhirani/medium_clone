@@ -25,7 +25,6 @@ const StarterModal = ({ isModalOpen, closeModal }) => {
 
   const loginAnonymously = () => {
     signInAnonymously(auth).then((user) => {
-      console.log(user);
       closeModal(false);
     });
   };

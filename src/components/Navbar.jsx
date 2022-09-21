@@ -60,7 +60,7 @@ const Navbar = () => {
                         </figure>
                       )}
                       {authData.isAnonymous && (
-                        <span className="text-black">{`Anonymous${authData?.uid.slice(
+                        <span className="text-black">{`Anony${authData?.uid.slice(
                           0,
                           4
                         )}`}</span>
