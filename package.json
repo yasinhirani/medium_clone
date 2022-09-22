@@ -1,5 +1,6 @@
 {
   "name": "medium_clone",
+  "homepage": "https://yasinhirani.github.io/medium-clone",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,6 +12,7 @@
     "autoprefixer": "^10.4.8",
     "firebase": "^9.9.4",
     "formik": "^2.2.9",
+    "gh-pages": "^4.0.0",
     "postcss": "^8.4.16",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -22,6 +24,8 @@
     "yup": "^0.32.11"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
