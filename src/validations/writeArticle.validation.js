@@ -20,7 +20,7 @@ const WriteArticleValidation = Yup.object({
         .trim(),
     })
   ),
-  category: Yup.string().required("Category is required"),
+  category: Yup.string().required("Category is required").trim(),
 });
 
 export default WriteArticleValidation;

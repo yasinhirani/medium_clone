@@ -26,7 +26,7 @@ const UserProfile = () => {
         <figure className="border-4 border-gray-300 inline-block rounded-full overflow-hidden w-[104px]">
           <img
             src={
-              authData.isAnonymous
+              authData?.isAnonymous
                 ? "/images/incognito_logo.png"
                 : authData?.photoURL
             }
@@ -34,15 +34,15 @@ const UserProfile = () => {
           />
         </figure>
         <p className="text-3xl font-semibold mt-3">
-          {authData.isAnonymous
+          {authData?.isAnonymous
             ? `Anonymous${authData?.uid.slice(0, 4)}`
             : authData?.displayName}
         </p>
         <p className="text-lg text-gray-500 font-semibold mt-3">
-          {!authData.isAnonymous && authData?.email}
+          {!authData?.isAnonymous && authData?.email}
         </p>
       </div>
-      {!authData.isAnonymous && (
+      {!authData?.isAnonymous && (
         <div>
           <p className="text-2xl font-semibold mt-3 border-b border-black inline-block mb-8">
             Your Articles
@@ -60,7 +60,7 @@ const UserProfile = () => {
           )}
         </div>
       )}
-      {authData.isAnonymous && (
+      {authData?.isAnonymous && (
         <>
           <p className="text-2xl font-semibold">
             Being an anonymous user you cannot post anything.
