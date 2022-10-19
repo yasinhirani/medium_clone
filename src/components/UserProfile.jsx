@@ -11,7 +11,7 @@ const UserProfile = () => {
 
   const myArticles =
     articles &&
-    articles.filter((article) => article.data.author === authData?.displayName);
+    articles.filter((article) => article.data.author_email === authData?.email);
 
   // console.log(myArticles);
 

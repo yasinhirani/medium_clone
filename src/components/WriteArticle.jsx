@@ -50,6 +50,7 @@ const WriteArticle = () => {
       ...values,
       date: serverTimestamp(),
       author: authData?.displayName,
+      author_email: authData?.email,
       author_image: authData?.photoURL,
     });
     // console.log(values);

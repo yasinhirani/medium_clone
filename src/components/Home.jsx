@@ -56,7 +56,7 @@ const Home = () => {
             </p>
           </div>
         )}
-        <div className="flex flex-col-reverse lg:flex-row items-start lg:space-x-10">
+        <div className="flex flex-col-reverse lg:flex-row lg:items-start lg:space-x-10 overflow-hidden">
           <div>
             {articles &&
               !articlesLoading &&
@@ -65,11 +65,11 @@ const Home = () => {
                 <Post key={Math.random()} id={article.id} {...article.data} />
               ))}
           </div>
-          <div className="mb-8 lg:mb-0">
+          <div className="mb-8 lg:mb-0 overflow-hidden">
             {categoryList && categoryList.length > 0 && (
               <h5 className="font-semibold text-xl mb-4">Filter:-</h5>
             )}
-            <div className="flex items-center space-x-5">
+            <div className="flex items-center space-x-3 overflow-auto">
               {categoryList &&
                 categoryList.length > 0 &&
                 categoryList.map((category) => {
@@ -80,12 +80,12 @@ const Home = () => {
                         filterText === category
                           ? "bg-gray-400 text-gray-800"
                           : "bg-gray-200 text-gray-600"
-                      } text-xs font-semibold px-4 py-1.5 rounded-full`}
+                      } text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap`}
                       onClick={() => {
                         handleFilter(category);
                       }}
                     >
-                      <p>{category}</p>
+                      <span>{category}</span>
                     </button>
                   );
                 })}

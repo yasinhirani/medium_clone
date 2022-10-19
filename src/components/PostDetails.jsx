@@ -23,6 +23,8 @@ const PostDetails = () => {
   const articleId = useParams();
 
   const [comments, setComments] = useState([]);
+  const [isListening, setIsListening] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const toastConfig = {
     position: "top-right",
@@ -34,13 +36,34 @@ const PostDetails = () => {
     progress: undefined,
   };
 
-  const listenArticle = (articleTitle, articleSubTitle) => {
-    const speechInstanceTitle = new SpeechSynthesisUtterance(
-      `${articleTitle}${" "}${articleSubTitle}`
-    );
-    speechInstanceTitle.pitch = 1;
-    speechInstanceTitle.rate = 0.8;
-    window.speechSynthesis.speak(speechInstanceTitle);
+  const listenArticle = (articleTitle, articleSubTitle, articleContent) => {
+    return new Promise((resolve, reject) => {
+      const speechInstanceTitle = new SpeechSynthesisUtterance(
+        `${articleTitle}${". "}${articleSubTitle}${". "}${articleContent.map(
+          (content) => `${content.contentText}${". "}`
+        )}`
+      );
+      speechInstanceTitle.pitch = 1.5;
+      speechInstanceTitle.rate = 0.8;
+      window.speechSynthesis.speak(speechInstanceTitle);
+      setIsListening(true);
+      speechInstanceTitle.onend = resolve;
+    });
+  };
+
+  const stopListening = () => {
+    window.speechSynthesis.cancel();
+    setIsListening(false);
+  };
+
+  const pauseListening = () => {
+    window.speechSynthesis.pause();
+    setIsPaused(true);
+  };
+
+  const resumeListening = () => {
+    window.speechSynthesis.resume();
+    setIsPaused(false);
   };
 
   const filterArticle =
@@ -123,16 +146,50 @@ const PostDetails = () => {
                     <p>{filterArticle[0]?.data.category}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    listenArticle(
-                      filterArticle[0]?.data.title,
-                      filterArticle[0]?.data.sub_title
-                    );
-                  }}
-                >
-                  listen
-                </button>
+                {!isListening && (
+                  <button
+                    onClick={() => {
+                      listenArticle(
+                        filterArticle[0]?.data.title,
+                        filterArticle[0]?.data.sub_title,
+                        filterArticle[0]?.data.content
+                      ).then(() => {
+                        setIsListening(false);
+                      });
+                    }}
+                  >
+                    listen
+                  </button>
+                )}
+                {isListening && (
+                  <div className="flex items-center space-x-4">
+                    {!isPaused && (
+                      <button
+                        onClick={() => {
+                          pauseListening();
+                        }}
+                      >
+                        Pause
+                      </button>
+                    )}
+                    {isPaused && (
+                      <button
+                        onClick={() => {
+                          resumeListening();
+                        }}
+                      >
+                        Resume
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        stopListening();
+                      }}
+                    >
+                      Stop
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -233,8 +290,8 @@ const PostDetails = () => {
                       </div>
                     </div>
                     {authData !== null &&
-                      authData.displayName ===
-                        filterArticle[0]?.data.author && (
+                      authData.email ===
+                        filterArticle[0]?.data.author_email && (
                         <button
                           onClick={() => {
                             deleteComment(comment.id);
