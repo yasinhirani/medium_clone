@@ -16,6 +16,8 @@ import { db } from "../Firebase";
 import CommentValidation from "../validations/Comment.Validation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { isMessageDirty } from "profanity-hindi";
+
 const PostDetails = () => {
   const { articles } = useContext(MediumContext);
   const { authData } = useContext(AuthContext);
@@ -103,16 +105,22 @@ const PostDetails = () => {
 
   const handleCommentSubmit = async (values, resetForm) => {
     // console.log(values);
-    await setDoc(newComment, {
-      ...values,
-      image: authData.isAnonymous ? "" : authData.photoURL,
-      name: authData.isAnonymous
-        ? `Anonymous${authData.uid.slice(0, 4)}`
-        : authData.displayName,
-      date: serverTimestamp(),
-    });
-    toast.success("Commented", toastConfig);
-    resetForm();
+    const isDirty = isMessageDirty(values.comment);
+    console.log(isDirty);
+    if (isDirty) {
+      toast.warning("Abusive words not allowed", toastConfig);
+    } else {
+      await setDoc(newComment, {
+        ...values,
+        image: authData.isAnonymous ? "" : authData.photoURL,
+        name: authData.isAnonymous
+          ? `Anonymous${authData.uid.slice(0, 4)}`
+          : authData.displayName,
+        date: serverTimestamp(),
+      });
+      toast.success("Commented", toastConfig);
+      resetForm();
+    }
   };
 
   const deleteComment = async (commentId) => {

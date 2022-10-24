@@ -7,9 +7,37 @@ import { db } from "../Firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRef } from "react";
+// import ReactQuill from "react-quill";
+// import "react-quill/dist/quill.bubble.css";
+// import { useState } from "react";
 // import { ref, uploadBytes } from "firebase/storage";
 const WriteArticle = () => {
   const { authData } = useContext(AuthContext);
+
+  // states for different fields
+
+  // const [title, setTitle] = useState('');
+  // const [subTitle, setSubTitle] = useState('');
+  // const [category, setCategory] = useState('');
+  // const [content, setContent] = useState('');
+  // const [imgUrl, setImgUrl] = useState('');
+
+  // const modules = {
+  //   toolbar: [
+  //     [{ 'header': [1, 2, false] }],
+  //     ['bold', 'italic', 'underline','strike', 'blockquote'],
+  //     [{'list': 'ordered'}, {'list': 'bullet'}],
+  //     ['link', 'image'],
+  //     ['clean']
+  //   ],
+  // }
+
+  // const formats = [
+  //   'header',
+  //   'bold', 'italic', 'underline', 'strike', 'blockquote',
+  //   'list', 'bullet',
+  //   'link', 'image',
+  // ]
 
   const buttonRef = useRef(null);
 
@@ -67,7 +95,7 @@ const WriteArticle = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-[40rem] mx-auto px-6 py-10 mt-20">
+    <div className="w-full max-w-[40rem] mx-auto px-6 py-10 mt-20 write-area">
       <h2 className="font-semibold text-xl mb-10 text-center underline">
         Lets get Started writing an article
       </h2>
@@ -279,6 +307,12 @@ const WriteArticle = () => {
           }}
         </Formik>
       </div>
+      {/* <ReactQuill className="my-4" theme="bubble" bounds=".write-area" modules={modules} formats={formats} value={title} placeholder="Title" onChange={(content) => setTitle(content)} />
+      <ReactQuill className="my-4" theme="bubble" bounds=".write-area" modules={modules} formats={formats} value={subTitle} placeholder="Sub title" onChange={(content) => setSubTitle(content)} />
+      <ReactQuill className="my-4" theme="bubble" bounds=".write-area" modules={modules} formats={formats} value={category} placeholder="Category" onChange={(content) => setCategory(content)} />
+      <ReactQuill className="my-4" theme="bubble" bounds=".write-area" modules={modules} formats={formats} value={content} placeholder="Content" onChange={(content) => setContent(content)} />
+      <ReactQuill className="my-4" theme="bubble" bounds=".write-area" modules={modules} formats={formats} value={imgUrl} placeholder="Image URL" onChange={(content) => setImgUrl(content)} />
+      <button className="px-4" disabled={title.length < 20 && subTitle.length < 20 && category.length < 10 && content.length < 20   } onClick={() => console.log(title, subTitle, category, content)}>Reveal</button> */}
       <ToastContainer />
     </div>
   );
