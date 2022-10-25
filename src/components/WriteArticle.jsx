@@ -1,6 +1,6 @@
 import { Formik, Field, Form, FieldArray } from "formik";
 import { useContext, useEffect } from "react";
-import { AuthContext } from "../context/Context";
+import { AuthContext, MediumContext } from "../context/Context";
 import WriteArticleValidation from "../validations/writeArticle.validation";
 import { doc, collection, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "../Firebase";
@@ -13,6 +13,7 @@ import { useRef } from "react";
 // import { ref, uploadBytes } from "firebase/storage";
 const WriteArticle = () => {
   const { authData } = useContext(AuthContext);
+  const { getArticles } = useContext(MediumContext);
 
   // states for different fields
 
@@ -86,6 +87,7 @@ const WriteArticle = () => {
     // setSelectedStyle([]);
     // setPostedArticle(true);
     toast.success("Posted Successfully", toastConfig);
+    getArticles();
     // console.log("Article posted");
   };
 

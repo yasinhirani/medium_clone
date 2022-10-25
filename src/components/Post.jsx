@@ -3,6 +3,8 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../Firebase";
 import { useState } from "react";
 import DeletePopup from "./DeletePopup";
+import { useContext } from "react";
+import { MediumContext } from "../context/Context";
 const Post = ({
   id,
   author,
@@ -14,6 +16,8 @@ const Post = ({
   category,
 }) => {
   // console.log(author, author_image, title, sub_title, post_image);
+  const { getArticles } = useContext(MediumContext);
+
   const { seconds } = date;
 
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
@@ -33,6 +37,7 @@ const Post = ({
     // console.log(articleId);
     await deleteDoc(doc(db, "articles", articleId));
     toggleDeletePopup(false);
+    getArticles();
   };
 
   return (

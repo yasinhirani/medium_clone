@@ -2,11 +2,13 @@ import {
   collection,
   deleteDoc,
   doc,
-  onSnapshot,
+  getDoc,
+  getDocs,
   orderBy,
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { Field, Form, Formik } from "formik";
 import { useContext, useEffect, useState } from "react";
@@ -27,6 +29,7 @@ const PostDetails = () => {
   const [comments, setComments] = useState([]);
   const [isListening, setIsListening] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const toastConfig = {
     position: "top-right",
@@ -83,28 +86,78 @@ const PostDetails = () => {
       }
     );
 
+  // Get following List
+  const getFollowingList = async () => {
+    const userDoc = await getDoc(doc(db, `users/${authData?.email}`));
+    if (userDoc.exists()) {
+      userDoc.data().followingList.forEach((list) => {
+        if (list === filterArticle[0].data.author_email) {
+          setIsFollowing(true);
+        } else {
+          setIsFollowing(false);
+        }
+      });
+    }
+  };
+
+  // Hanlde follow
+  const handleFollow = async () => {
+    const articleOwner = await getDoc(
+      doc(db, `users/${filterArticle[0]?.data.author_email}`)
+    );
+    const userDoc = await getDoc(doc(db, `users/${authData.email}`));
+    await updateDoc(doc(db, `users/${filterArticle[0].data.author_email}`), {
+      followers: articleOwner.data().followers + 1,
+    });
+    await updateDoc(doc(db, `users/${authData.email}`), {
+      following: userDoc.data().following + 1,
+      followingList: [
+        ...userDoc.data().followingList,
+        filterArticle[0]?.data.author_email,
+      ],
+    });
+    getFollowingList();
+  };
+
+  // Handle Unfollow
+  const handleUnfollow = async () => {
+    const articleOwner = await getDoc(
+      doc(db, `users/${filterArticle[0]?.data.author_email}`)
+    );
+    const userDoc = await getDoc(doc(db, `users/${authData.email}`));
+    await updateDoc(doc(db, `users/${filterArticle[0].data.author_email}`), {
+      followers: articleOwner.data().followers - 1,
+    });
+    const updatedFollowingList = userDoc
+      .data()
+      .followingList.filter(
+        (list) => list !== filterArticle[0]?.data.author_email
+      );
+    await updateDoc(doc(db, `users/${authData.email}`), {
+      following: userDoc.data().following - 1,
+      followingList: updatedFollowingList,
+    });
+    getFollowingList();
+  };
+
+  // Get All the Comments
   const getComments = async () => {
-    // console.log(articleId.id);
-    await onSnapshot(
+    const commentSnapshot = await getDocs(
       query(
         collection(db, `articles/${articleId.id}/comments`),
         orderBy("date", "desc")
-      ),
-      (snapshot) => {
-        setComments(
-          snapshot.docs.map((doc) => {
-            return { id: doc.id, commentsArray: doc.data() };
-          })
-        );
-        // console.log(snapshot.docs.map((doc) => doc.data()));
-      }
+      )
+    );
+    setComments(
+      commentSnapshot.docs.map((doc) => {
+        return { id: doc.id, commentsArray: doc.data() };
+      })
     );
   };
 
-  const newComment = doc(collection(db, `articles/${articleId.id}/comments`));
-
+  // Post a comment
   const handleCommentSubmit = async (values, resetForm) => {
-    // console.log(values);
+    const newComment = doc(collection(db, `articles/${articleId.id}/comments`));
     const isDirty = isMessageDirty(values.comment);
     console.log(isDirty);
     if (isDirty) {
@@ -117,19 +170,39 @@ const PostDetails = () => {
           ? `Anonymous${authData.uid.slice(0, 4)}`
           : authData.displayName,
         date: serverTimestamp(),
-      });
+      })
+        .then(() => console.log("Email sent"))
+        .catch((err) => console.log(err));
       toast.success("Commented", toastConfig);
       resetForm();
+      getComments();
+      const options = {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "X-RapidAPI-Key":
+            "b270c8a6c1mshfa428feb3857501p110f3cjsn471755706752",
+          "X-RapidAPI-Host": "rapidprod-sendgrid-v1.p.rapidapi.com",
+        },
+        body: `{"personalizations":[{"to":[{"email":${filterArticle[0].data.author_email}}],"subject":"Comment on Article"}],"from":{"email":"noreply@yasinmediumclone.com"},"content":[{"type":"text/html","value":"<p>Hey someone has commented on your article, view now on <a href=https://yasin-medium-clone.netlify.app/article/${articleId.id}>https://yasin-medium-clone.netlify.app/article/${articleId.id}</a></p><p>Comment: ${values.comment}</p>"}]}`,
+      };
+
+      fetch("https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send", options)
+        .then((response) => response.json())
+        .then((response) => console.log(response))
+        .catch((err) => console.error(err));
     }
   };
 
+  // Delete a comment
   const deleteComment = async (commentId) => {
-    // console.log(commentId);
     await deleteDoc(doc(db, `articles/${articleId.id}/comments/${commentId}`));
+    getComments();
   };
 
   useEffect(() => {
     getComments();
+    getFollowingList();
     window.scrollTo(0, 0);
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,10 +217,23 @@ const PostDetails = () => {
               <img src={filterArticle[0]?.data.author_image} alt="" />
             </figure>
             <div className="flex-grow">
-              <p className="text-xl font-medium">
-                {filterArticle[0]?.data.author}
-              </p>
-              <div className="flex justify-between items-center mt-1">
+              <div className="flex justify-between items-center">
+                <p className="text-xl font-medium">
+                  {filterArticle[0]?.data.author}
+                </p>
+                {filterArticle[0].data.author_email !== authData.email &&
+                  !authData.isAnonymous && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        isFollowing ? handleUnfollow() : handleFollow()
+                      }
+                    >
+                      {isFollowing ? "Unfollow" : "Follow"}
+                    </button>
+                  )}
+              </div>
+              <div className="flex justify-between items-center mt-2">
                 <div className="flex items-center space-x-3">
                   <p className="text-sm text-gray-500">{newDate}</p>
                   <div className="bg-gray-200 text-gray-600 text-xs font-semibold px-3 py-0.5 rounded-full">

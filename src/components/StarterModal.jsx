@@ -12,14 +12,6 @@ const StarterModal = ({ isModalOpen, closeModal }) => {
 
   const loginWithGoogle = () => {
     const provider = new GoogleAuthProvider();
-    // signInWithPopup(auth, provider)
-    //   .then((result) => {
-    //     closeModal(false);
-    //     setAuthData(result.user);
-    //   })
-    //   .catch((e) => {
-    //     console.log(e);
-    //   });
     signInWithRedirect(auth, provider);
   };
 

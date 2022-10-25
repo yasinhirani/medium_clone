@@ -1,11 +1,16 @@
+import { doc, getDoc } from "firebase/firestore";
+import { useState } from "react";
 import { useContext, useEffect } from "react";
 // import { useParams } from "react-router-dom";
 import { AuthContext, MediumContext } from "../context/Context";
+import { db } from "../Firebase";
 import Post from "./Post";
 
 const UserProfile = () => {
   const { authData } = useContext(AuthContext);
   const { articles } = useContext(MediumContext);
+
+  const [userData, setUserData] = useState([]);
 
   //   const username = useParams();
 
@@ -15,9 +20,18 @@ const UserProfile = () => {
 
   // console.log(myArticles);
 
+  const getUserDetail = async () => {
+    const userDoc = await getDoc(
+      doc(db, `users/${authData.email}`)
+    );
+    setUserData(userDoc.data())
+  }
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    getUserDetail();
     return () => {};
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -41,6 +55,16 @@ const UserProfile = () => {
         <p className="text-lg text-gray-500 font-semibold mt-3">
           {!authData?.isAnonymous && authData?.email}
         </p>
+        <div className="flex justify-between items-center w-1/2 mt-5">
+          <div className="flex items-center space-x-2">
+            <p>Followers:</p>
+            <span>{userData?.followers}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <p>Following:</p>
+            <span>{userData?.following}</span>
+          </div>
+        </div>
       </div>
       {!authData?.isAnonymous && (
         <div>
