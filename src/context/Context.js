@@ -78,26 +78,31 @@ const AuthProvider = ({ children }) => {
     const userDoc = await getDoc(doc(db, `users/${email}`));
     if (userDoc.exists()) {
       return;
-    }
-    else if(isAnonymous){
+    } else if (isAnonymous) {
       return;
-    }
-    else{
+    } else {
       await setDoc(doc(db, `users/${email}`), {
         name: displayName,
         email: email,
         followers: 0,
-        following: 0
-      })
+        following: 0,
+        followingList: [],
+      });
     }
-  }
+  };
 
   useEffect(() => {
     setLoading(true);
     onAuthStateChanged(auth, (currentUser) => {
       setAuthData(currentUser);
       setLoading(false);
-      setUserData(currentUser.email, currentUser.displayName, currentUser.isAnonymous);
+      if (currentUser) {
+        setUserData(
+          currentUser.email,
+          currentUser.displayName,
+          currentUser.isAnonymous
+        );
+      }
       // console.log(currentUser);
     });
     return () => {};

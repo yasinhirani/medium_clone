@@ -88,15 +88,17 @@ const PostDetails = () => {
 
   // Get following List
   const getFollowingList = async () => {
-    const userDoc = await getDoc(doc(db, `users/${authData?.email}`));
-    if (userDoc.exists()) {
-      userDoc.data().followingList.forEach((list) => {
-        if (list === filterArticle[0].data.author_email) {
-          setIsFollowing(true);
-        } else {
-          setIsFollowing(false);
-        }
-      });
+    if (authData !== null) {
+      const userDoc = await getDoc(doc(db, `users/${authData?.email}`));
+      if (userDoc.exists()) {
+        userDoc.data().followingList.forEach((list) => {
+          if (list === filterArticle[0].data.author_email) {
+            setIsFollowing(true);
+          } else {
+            setIsFollowing(false);
+          }
+        });
+      }
     }
   };
 
@@ -221,7 +223,7 @@ const PostDetails = () => {
                 <p className="text-xl font-medium">
                   {filterArticle[0]?.data.author}
                 </p>
-                {filterArticle[0].data.author_email !== authData.email &&
+                {authData && filterArticle[0].data.author_email !== authData.email &&
                   !authData.isAnonymous && (
                     <button
                       type="button"
