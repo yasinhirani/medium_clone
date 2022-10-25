@@ -55,7 +55,7 @@ const UserProfile = () => {
         <p className="text-lg text-gray-500 font-semibold mt-3">
           {!authData?.isAnonymous && authData?.email}
         </p>
-        <div className="flex justify-between items-center w-1/2 mt-5">
+        <div className="flex justify-between items-center w-full sm:w-1/2 mt-5">
           <div className="flex items-center space-x-2">
             <p>Followers:</p>
             <span>{userData?.followers}</span>
