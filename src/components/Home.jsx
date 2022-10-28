@@ -105,7 +105,7 @@ const Home = () => {
               <h5 className="font-semibold text-xl mb-4">Filter:-</h5>
             )}
             <div className="flex items-center space-x-3 overflow-auto">
-              {authData !== null &&
+              {authData !== null && !authData.isAnonymous &&
                 categoryList.length > 0 &&
                 followingList?.followingList?.length > 0 && (
                   <button

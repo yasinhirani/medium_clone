@@ -88,7 +88,6 @@ const PostDetails = () => {
 
   // Get following List
   const getFollowingList = async () => {
-    console.log("function called");
     if (authData !== null) {
       const userDoc = await getDoc(doc(db, `users/${authData.email}`));
       if (userDoc.exists() && filterArticle[0]) {
