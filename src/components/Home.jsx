@@ -62,7 +62,7 @@ const Home = () => {
 
   useEffect(() => {
     const getUserDoc = async () => {
-      const userDoc = await getDoc(doc(db, `users/${authData.email}`));
+      const userDoc = await getDoc(doc(db, `users/${authData?.email}`));
       if (userDoc.exists()) {
         setFollowingList(userDoc.data());
       }

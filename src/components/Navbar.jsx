@@ -12,8 +12,6 @@ const Navbar = () => {
   // Auth Context
   const { authData, logOut, loading } = useContext(AuthContext);
 
-  const username = authData?.displayName;
-
   const closeModal = (close) => {
     setIsStarterModalOpen(close);
   };
@@ -106,7 +104,7 @@ const Navbar = () => {
                       <Menu.Item>
                         <Link
                           to={`/profile/${
-                            username && username.replace(" ", "").toLowerCase()
+                            authData.email
                           }`}
                           className="block"
                         >

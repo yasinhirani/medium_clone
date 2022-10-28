@@ -9,6 +9,7 @@ const Post = ({
   id,
   author,
   author_image,
+  author_email,
   title,
   sub_title,
   post_image,
@@ -45,12 +46,12 @@ const Post = ({
       {/* <Link to={`/article/${id}`} className="w-full md:w-max"> */}
       <div className="py-5 flex justify-between items-center space-x-5 sm:space-x-10 w-full md:w-max">
         <div className="flex-grow">
-          <div className="flex space-x-3 items-center">
+          <Link to={`/profile/${author_email}`} className="flex space-x-3 items-center">
             <figure className="w-6 h-6 rounded-full overflow-hidden">
               <img src={author_image} alt="" />
             </figure>
             <span className="font-medium text-sm">{author}</span>
-          </div>
+          </Link>
           <Link to={`/article/${id}`}>
             <h4 className="font-bold text-lg md:text-2xl leading-6 text-gray-900 md:w-[25ch] line-clamp-2 my-1">
               {title}
