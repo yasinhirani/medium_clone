@@ -88,16 +88,18 @@ const PostDetails = () => {
 
   // Get following List
   const getFollowingList = async () => {
+    console.log("function called");
     if (authData !== null) {
-      const userDoc = await getDoc(doc(db, `users/${authData?.email}`));
-      if (userDoc.exists()) {
-        userDoc.data().followingList.forEach((list) => {
-          if (list === filterArticle[0].data.author_email) {
-            setIsFollowing(true);
-          } else {
-            setIsFollowing(false);
-          }
-        });
+      const userDoc = await getDoc(doc(db, `users/${authData.email}`));
+      if (userDoc.exists() && filterArticle[0]) {
+        const findFollowing = userDoc.data().followingList.includes(
+          filterArticle[0]?.data.author_email
+        );
+        if (findFollowing) {
+          setIsFollowing(true);
+        } else {
+          setIsFollowing(false);
+        }
       }
     }
   };
@@ -204,11 +206,16 @@ const PostDetails = () => {
 
   useEffect(() => {
     getComments();
-    getFollowingList();
     window.scrollTo(0, 0);
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    getFollowingList();
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterArticle]);
 
   return (
     <>
@@ -223,16 +230,21 @@ const PostDetails = () => {
                 <p className="text-xl font-medium">
                   {filterArticle[0]?.data.author}
                 </p>
-                {authData && filterArticle[0].data.author_email !== authData.email &&
+                {authData &&
+                  filterArticle[0].data.author_email !== authData.email &&
                   !authData.isAnonymous && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        isFollowing ? handleUnfollow() : handleFollow()
-                      }
-                    >
-                      {isFollowing ? "Unfollow" : "Follow"}
-                    </button>
+                    <div>
+                      {!isFollowing && (
+                        <button type="button" onClick={() => handleFollow()}>
+                          Follow
+                        </button>
+                      )}
+                      {isFollowing && (
+                        <button type="button" onClick={() => handleUnfollow()}>
+                          Unfollow
+                        </button>
+                      )}
+                    </div>
                   )}
               </div>
               <div className="flex justify-between items-center mt-2">

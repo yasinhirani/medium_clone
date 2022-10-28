@@ -1,27 +1,51 @@
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useContext, useRef } from "react";
 import { Link } from "react-router-dom";
-import { MediumContext } from "../context/Context";
+import { AuthContext, MediumContext } from "../context/Context";
+import { db } from "../Firebase";
 import Banner from "./Banner";
 import Post from "./Post";
 
 const Home = () => {
   const { articles, articlesLoading } = useContext(MediumContext);
+  const { authData } = useContext(AuthContext);
   const [allArticles, setAllArticles] = useState({});
   const [categoryList, setCategoryList] = useState([]);
   const [filterText, setFilterText] = useState("");
+  const [followingList, setFollowingList] = useState([]);
   // console.log(articles);
   const articleRef = useRef(null);
   const goToArticle = () => {
     articleRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleFilter = (category) => {
+  const handleFilter = async (category) => {
+    let filteredArticles;
     setFilterText(category);
-    const filteredArticles =
-      articles &&
-      articles.filter((article) => article.data.category === category);
-    setAllArticles(filteredArticles);
+    if (category === "My Following") {
+      const userDoc = await getDoc(doc(db, `users/${authData.email}`));
+      if (userDoc.exists()) {
+        filteredArticles =
+          articles &&
+          articles.filter((article) =>
+            userDoc.data().followingList.includes(article.data.author_email)
+          );
+        // filteredArticles =
+        //   articles &&
+        //   articles.filter((article) =>
+        //     userDoc
+        //       .data()
+        //       .followingList.some((list) => article.data.author_email === list)
+        //   );
+        setAllArticles(filteredArticles);
+      }
+    } else {
+      filteredArticles =
+        articles &&
+        articles.filter((article) => article.data.category === category);
+      setAllArticles(filteredArticles);
+    }
   };
 
   const handleClearFilter = () => {
@@ -34,6 +58,17 @@ const Home = () => {
     articles && articles.map((data) => list.push(data.data.category));
     setCategoryList([...new Set(list)]);
     setAllArticles(articles);
+  }, [articles]);
+
+  useEffect(() => {
+    const getUserDoc = async () => {
+      const userDoc = await getDoc(doc(db, `users/${authData.email}`));
+      if (userDoc.exists()) {
+        setFollowingList(userDoc.data());
+      }
+    };
+    getUserDoc();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [articles]);
   return (
     <>
@@ -70,6 +105,21 @@ const Home = () => {
               <h5 className="font-semibold text-xl mb-4">Filter:-</h5>
             )}
             <div className="flex items-center space-x-3 overflow-auto">
+              {authData !== null &&
+                categoryList.length > 0 &&
+                followingList?.followingList?.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => handleFilter("My Following")}
+                    className={`${
+                      filterText === "My Following"
+                        ? "bg-gray-400 text-gray-800"
+                        : "bg-gray-200 text-gray-600"
+                    } text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap`}
+                  >
+                    My Following
+                  </button>
+                )}
               {categoryList &&
                 categoryList.length > 0 &&
                 categoryList.map((category) => {
