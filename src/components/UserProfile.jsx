@@ -12,12 +12,14 @@ const UserProfile = () => {
 
   const [userData, setUserData] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filterArticle, setFilterArticle] = useState([]);
 
   const { name } = useParams();
 
-  const myArticles =
-    articles &&
-    articles.filter((article) => article.data.author_email === name);
+  // const myArticles =
+  //   articles &&
+  //   articles.filter((article) => article.data.author_email === name);
 
   // console.log(myArticles);
 
@@ -29,13 +31,16 @@ const UserProfile = () => {
   // Get following List
   const getFollowingList = async () => {
     if (authData !== null) {
+      setIsLoading(true);
       const userDoc = await getDoc(doc(db, `users/${authData.email}`));
       if (userDoc.exists()) {
         const findFollowing = userDoc.data().followingList.includes(name);
         if (findFollowing) {
           setIsFollowing(true);
+          setIsLoading(false);
         } else {
           setIsFollowing(false);
+          setIsLoading(false);
         }
       }
     }
@@ -43,57 +48,55 @@ const UserProfile = () => {
 
   // Hanlde follow
   const handleFollow = async () => {
-    const articleOwner = await getDoc(
-      doc(db, `users/${name}`)
-    );
+    setIsLoading(true);
+    const articleOwner = await getDoc(doc(db, `users/${name}`));
     const userDoc = await getDoc(doc(db, `users/${authData.email}`));
     await updateDoc(doc(db, `users/${name}`), {
       followers: articleOwner.data().followers + 1,
     });
     await updateDoc(doc(db, `users/${authData.email}`), {
       following: userDoc.data().following + 1,
-      followingList: [
-        ...userDoc.data().followingList,
-        name,
-      ],
-    });
+      followingList: [...userDoc.data().followingList, name],
+    }).then(() => setIsLoading(false));
     getFollowingList();
     getUserDetail();
   };
 
   // Handle Unfollow
   const handleUnfollow = async () => {
-    const articleOwner = await getDoc(
-      doc(db, `users/${name}`)
-    );
+    setIsLoading(true);
+    const articleOwner = await getDoc(doc(db, `users/${name}`));
     const userDoc = await getDoc(doc(db, `users/${authData.email}`));
     await updateDoc(doc(db, `users/${name}`), {
       followers: articleOwner.data().followers - 1,
     });
     const updatedFollowingList = userDoc
       .data()
-      .followingList.filter(
-        (list) => list !== name
-      );
+      .followingList.filter((list) => list !== name);
     await updateDoc(doc(db, `users/${authData.email}`), {
       following: userDoc.data().following - 1,
       followingList: updatedFollowingList,
-    });
+    }).then(() => setIsLoading(false));
     getFollowingList();
     getUserDetail();
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setFilterArticle(
+      articles &&
+        articles.filter((article) => article.data.author_email === name)
+    );
     getUserDetail();
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
+  }, [articles]);
+
   useEffect(() => {
     name !== authData?.email && getFollowingList();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myArticles])
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="w-full max-w-[45rem] mx-auto px-6 py-6 mt-16">
@@ -109,17 +112,20 @@ const UserProfile = () => {
           />
         </figure>
         {authData && name !== authData.email && !authData.isAnonymous && (
-          <div className="mt-5">
-            {!isFollowing && (
-              <button type="button" onClick={() => handleFollow()}>
-                Follow
-              </button>
-            )}
-            {isFollowing && (
-              <button type="button" onClick={() => handleUnfollow()}>
-                Unfollow
-              </button>
-            )}
+          <div>
+            {!isLoading && <div className="mt-5">
+              {!isFollowing && (
+                <button type="button" onClick={() => handleFollow()}>
+                  Follow
+                </button>
+              )}
+              {isFollowing && (
+                <button type="button" onClick={() => handleUnfollow()}>
+                  Unfollow
+                </button>
+              )}
+            </div>}
+            {isLoading && <div className="loader mt-5"></div>}
           </div>
         )}
         <p className="text-3xl font-semibold mt-3">
@@ -146,8 +152,8 @@ const UserProfile = () => {
           <p className="text-2xl font-semibold mt-3 border-b border-black inline-block mb-8">
             Your Articles
           </p>
-          {myArticles.length !== 0 ? (
-            myArticles.map((article) => {
+          {filterArticle.length !== 0 ? (
+            filterArticle.map((article) => {
               return (
                 <Post key={Math.random()} id={article.id} {...article.data} />
               );

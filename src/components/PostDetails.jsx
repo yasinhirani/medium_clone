@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { Field, Form, Formik } from "formik";
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { AuthContext, MediumContext } from "../context/Context";
 import { db } from "../Firebase";
 import CommentValidation from "../validations/Comment.Validation";
@@ -30,6 +30,8 @@ const PostDetails = () => {
   const [isListening, setIsListening] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filterArticle, setFilterArticle] = useState([]);
 
   const toastConfig = {
     position: "top-right",
@@ -71,8 +73,8 @@ const PostDetails = () => {
     setIsPaused(false);
   };
 
-  const filterArticle =
-    articles && articles.filter((article) => articleId.id === article.id);
+  // const filterArticle =
+  //   articles && articles.filter((article) => articleId.id === article.id);
 
   // console.log(filterArticle);
 
@@ -89,15 +91,18 @@ const PostDetails = () => {
   // Get following List
   const getFollowingList = async () => {
     if (authData !== null) {
+      setIsLoading(true);
       const userDoc = await getDoc(doc(db, `users/${authData.email}`));
       if (userDoc.exists() && filterArticle[0]) {
-        const findFollowing = userDoc.data().followingList.includes(
-          filterArticle[0]?.data.author_email
-        );
+        const findFollowing = userDoc
+          .data()
+          .followingList.includes(filterArticle[0]?.data.author_email);
         if (findFollowing) {
           setIsFollowing(true);
+          setIsLoading(false);
         } else {
           setIsFollowing(false);
+          setIsLoading(false);
         }
       }
     }
@@ -105,6 +110,7 @@ const PostDetails = () => {
 
   // Hanlde follow
   const handleFollow = async () => {
+    setIsLoading(true);
     const articleOwner = await getDoc(
       doc(db, `users/${filterArticle[0]?.data.author_email}`)
     );
@@ -118,12 +124,13 @@ const PostDetails = () => {
         ...userDoc.data().followingList,
         filterArticle[0]?.data.author_email,
       ],
-    });
+    }).then(() => setIsLoading(false));
     getFollowingList();
   };
 
   // Handle Unfollow
   const handleUnfollow = async () => {
+    setIsLoading(true);
     const articleOwner = await getDoc(
       doc(db, `users/${filterArticle[0]?.data.author_email}`)
     );
@@ -139,7 +146,7 @@ const PostDetails = () => {
     await updateDoc(doc(db, `users/${authData.email}`), {
       following: userDoc.data().following - 1,
       followingList: updatedFollowingList,
-    });
+    }).then(() => setIsLoading(false));
     getFollowingList();
   };
 
@@ -204,14 +211,17 @@ const PostDetails = () => {
   };
 
   useEffect(() => {
+    setFilterArticle(
+      articles && articles.filter((article) => articleId.id === article.id)
+    );
     getComments();
     window.scrollTo(0, 0);
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [articles]);
 
   useEffect(() => {
-    getFollowingList();
+    filterArticle[0]?.data.author_email !== authData?.email && getFollowingList();
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterArticle]);
@@ -221,9 +231,11 @@ const PostDetails = () => {
       {filterArticle.length > 0 ? (
         <div className="w-full max-w-[50rem] mx-auto px-6 py-10 mt-20">
           <div className="flex space-x-4 items-center w-full">
-            <figure className="w-12 h-12 rounded-full overflow-hidden">
-              <img src={filterArticle[0]?.data.author_image} alt="" />
-            </figure>
+            <Link to={`/profile/${filterArticle[0].data.author_email}`}>
+              <figure className="w-12 h-12 rounded-full overflow-hidden">
+                <img src={filterArticle[0]?.data.author_image} alt="" />
+              </figure>
+            </Link>
             <div className="flex-grow">
               <div className="flex justify-between items-center">
                 <p className="text-xl font-medium">
@@ -233,16 +245,27 @@ const PostDetails = () => {
                   filterArticle[0].data.author_email !== authData.email &&
                   !authData.isAnonymous && (
                     <div>
-                      {!isFollowing && (
-                        <button type="button" onClick={() => handleFollow()}>
-                          Follow
-                        </button>
+                      {!isLoading && (
+                        <div>
+                          {!isFollowing && (
+                            <button
+                              type="button"
+                              onClick={() => handleFollow()}
+                            >
+                              Follow
+                            </button>
+                          )}
+                          {isFollowing && (
+                            <button
+                              type="button"
+                              onClick={() => handleUnfollow()}
+                            >
+                              Unfollow
+                            </button>
+                          )}
+                        </div>
                       )}
-                      {isFollowing && (
-                        <button type="button" onClick={() => handleUnfollow()}>
-                          Unfollow
-                        </button>
-                      )}
+                      {isLoading && <div className="loader"></div>}
                     </div>
                   )}
               </div>
