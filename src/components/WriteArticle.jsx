@@ -2,7 +2,7 @@ import { Formik, Field, Form, FieldArray } from "formik";
 import { useContext, useEffect } from "react";
 import { AuthContext, MediumContext } from "../context/Context";
 import WriteArticleValidation from "../validations/writeArticle.validation";
-import { doc, collection, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, serverTimestamp, addDoc } from "firebase/firestore";
 import { db } from "../Firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -74,13 +74,34 @@ const WriteArticle = () => {
     // uploadBytes(storageRef, uploadedImageUrl).then((snapshot) => {
     //   console.log("uploaded");
     // });
-    const newArticle = doc(collection(db, "articles"));
-    await setDoc(newArticle, {
+    const newArticle = collection(db, "articles");
+    await addDoc(newArticle, {
       ...values,
       date: serverTimestamp(),
       author: authData?.displayName,
       author_email: authData?.email,
       author_image: authData?.photoURL,
+    }).then((docRef) => {
+      const body = {
+        to: authData?.email,
+        from: "noreply.yasinmediumclone@gmail.com",
+        subject: "Article Posted",
+        html: `
+        <h3>Dear ${authData?.displayName},</h3>
+        <h2>Hey, You have successfully posted an article</h2>
+        <h3>View now on: <a href=https://yasin-medium-clone.netlify.app/article/${docRef.id}>https://yasin-medium-clone.netlify.app/article/${docRef.id}</a></h3>
+        <p>Thanks,</p>
+        <p>Yasin Medium Clone</p>`,
+      };
+      const options = {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      };
+      fetch("https://yasin-medium-clone.herokuapp.com/sendEmail", options);
     });
     // console.log(values);
     resetForm();

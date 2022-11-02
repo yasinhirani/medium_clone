@@ -1,4 +1,5 @@
 import {
+  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -7,7 +8,6 @@ import {
   orderBy,
   query,
   serverTimestamp,
-  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { Field, Form, Formik } from "formik";
@@ -167,13 +167,13 @@ const PostDetails = () => {
 
   // Post a comment
   const handleCommentSubmit = async (values, resetForm) => {
-    const newComment = doc(collection(db, `articles/${articleId.id}/comments`));
+    const newComment = collection(db, `articles/${articleId.id}/comments`);
     const isDirty = isMessageDirty(values.comment);
     console.log(isDirty);
     if (isDirty) {
       toast.warning("Abusive words not allowed", toastConfig);
     } else {
-      await setDoc(newComment, {
+      await addDoc(newComment, {
         ...values,
         image: authData.isAnonymous ? "" : authData.photoURL,
         name: authData.isAnonymous
@@ -186,21 +186,6 @@ const PostDetails = () => {
       toast.success("Commented", toastConfig);
       resetForm();
       getComments();
-      const options = {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "X-RapidAPI-Key":
-            "b270c8a6c1mshfa428feb3857501p110f3cjsn471755706752",
-          "X-RapidAPI-Host": "rapidprod-sendgrid-v1.p.rapidapi.com",
-        },
-        body: `{"personalizations":[{"to":[{"email":${filterArticle[0].data.author_email}}],"subject":"Comment on Article"}],"from":{"email":"noreply@yasinmediumclone.com"},"content":[{"type":"text/html","value":"<p>Hey someone has commented on your article, view now on <a href=https://yasin-medium-clone.netlify.app/article/${articleId.id}>https://yasin-medium-clone.netlify.app/article/${articleId.id}</a></p><p>Comment: ${values.comment}</p>"}]}`,
-      };
-
-      fetch("https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send", options)
-        .then((response) => response.json())
-        .then((response) => console.log(response))
-        .catch((err) => console.error(err));
     }
   };
 
@@ -221,7 +206,8 @@ const PostDetails = () => {
   }, [articles]);
 
   useEffect(() => {
-    filterArticle[0]?.data.author_email !== authData?.email && getFollowingList();
+    filterArticle[0]?.data.author_email !== authData?.email &&
+      getFollowingList();
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterArticle]);

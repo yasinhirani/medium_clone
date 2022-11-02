@@ -20,20 +20,6 @@ const MediumProvider = ({ children }) => {
 
   const getArticles = async () => {
     setArticlesLoading(true);
-    // await onSnapshot(
-    //   query(collection(db, "articles"), orderBy("date", "desc")),
-    //   (snapShot) => {
-    //     setArticlesLoading(false);
-    //     setArticles(
-    //       snapShot.docs.map((doc) => {
-    //         return {
-    //           id: doc.id,
-    //           data: doc.data(),
-    //         };
-    //       })
-    //     );
-    //   }
-    // );
     const articlesSnapshot = await getDocs(
       query(collection(db, "articles"), orderBy("date", "desc"))
     ).finally(() => setArticlesLoading(false));
@@ -88,6 +74,26 @@ const AuthProvider = ({ children }) => {
         following: 0,
         followingList: [],
       });
+      const body = {
+        to: email,
+        from: "noreply.yasinmediumclone@gmail.com",
+        subject: "Welcome to Yasin Medium Clone",
+        html: `<h1>Welcome To Yasin Medium Clone</h1>
+        <h3>Dear ${displayName},</h3>
+        <h3>A heartily welcome to yasin medium clone, a place where you can dicover stories and thinkings on various topics from different writers and share with everyone your stories and thinkings.</h3>
+        <h3>Hope you have a great journey ahead...</h3>
+        <p>Thanks,</p>
+        <p>Yasin Medium Clone</p>`,
+      };
+      const options = {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      };
+      fetch("https://yasin-medium-clone.herokuapp.com/sendEmail", options);
     }
   };
 
