@@ -80,7 +80,7 @@ const AuthProvider = ({ children }) => {
         subject: "Welcome to Yasin Medium Clone",
         html: `<h1>Welcome To Yasin Medium Clone</h1>
         <h3>Dear ${displayName},</h3>
-        <h3>A heartily welcome to yasin medium clone, a place where you can dicover stories and thinkings on various topics from different writers and share with everyone your stories and thinkings.</h3>
+        <h3>A heartily welcome to yasin medium clone, a place where you can discover stories and thinkings on various topics from different writers and share with everyone your stories and thinkings.</h3>
         <h3>Hope you have a great journey ahead...</h3>
         <p>Thanks,</p>
         <p>Yasin Medium Clone</p>`,
