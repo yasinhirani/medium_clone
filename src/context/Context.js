@@ -64,7 +64,7 @@ const AuthProvider = ({ children }) => {
       });
   };
 
-  const setUserData = async (email, displayName, isAnonymous) => {
+  const setUserData = async (email, displayName, isAnonymous, photoUrl) => {
     const userDoc = await getDoc(doc(db, `users/${email}`));
     if (userDoc.exists()) {
       return;
@@ -77,6 +77,7 @@ const AuthProvider = ({ children }) => {
         followers: 0,
         following: 0,
         followingList: [],
+        profilePicture: photoUrl,
       });
       const body = {
         to: email,
@@ -110,7 +111,8 @@ const AuthProvider = ({ children }) => {
         setUserData(
           currentUser.email,
           currentUser.displayName,
-          currentUser.isAnonymous
+          currentUser.isAnonymous,
+          currentUser.photoURL
         );
       }
       // console.log(currentUser);
