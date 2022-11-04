@@ -60,6 +60,27 @@ const UserProfile = () => {
     }).then(() => setIsLoading(false));
     getFollowingList();
     getUserDetail();
+    const body = {
+      to: name,
+      from: "noreply.yasinmediumclone@gmail.com",
+      subject: "New Follower",
+      html: `<h1>New Follower</h1>
+        <h3>Dear ${userData.name},</h3>
+        <h3>You have a new follower, people are loving your content, congrates on your achivement</h3>
+        <h3>Follower Name: ${authData.displayName}</h3>
+        <h3>Follower Email: ${authData.email}</h3>
+        <p>Thanks,</p>
+        <p>Yasin Medium Clone</p>`,
+    };
+    const options = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    };
+    fetch("https://yasin-medium-clone.herokuapp.com/sendEmail", options);
   };
 
   // Handle Unfollow
@@ -96,7 +117,7 @@ const UserProfile = () => {
     name !== authData?.email && getFollowingList();
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authData]);
 
   return (
     <div className="w-full max-w-[45rem] mx-auto px-6 py-6 mt-16">

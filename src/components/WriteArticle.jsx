@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRef } from "react";
 // import ReactQuill from "react-quill";
-// import "react-quill/dist/quill.bubble.css";
+// import "react-quill/dist/quill.snow.css";
 // import { useState } from "react";
 // import { ref, uploadBytes } from "firebase/storage";
 const WriteArticle = () => {
@@ -22,6 +22,7 @@ const WriteArticle = () => {
   // const [category, setCategory] = useState('');
   // const [content, setContent] = useState('');
   // const [imgUrl, setImgUrl] = useState('');
+
 
   // const modules = {
   //   toolbar: [
@@ -103,7 +104,7 @@ const WriteArticle = () => {
       };
       fetch("https://yasin-medium-clone.herokuapp.com/sendEmail", options);
     });
-    // console.log(values);
+    // console.log(values, content);
     resetForm();
     // setSelectedStyle([]);
     // setPostedArticle(true);

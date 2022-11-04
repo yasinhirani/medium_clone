@@ -10,6 +10,7 @@ import {
 import { createContext, useEffect, useState } from "react";
 import { db } from "../Firebase";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const MediumContext = createContext();
 const AuthContext = createContext();
@@ -44,6 +45,8 @@ const MediumProvider = ({ children }) => {
 };
 
 const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
+
   const [authData, setAuthData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -54,6 +57,7 @@ const AuthProvider = ({ children }) => {
       .then(() => {
         // console.log("Logout successfull");
         setAuthData(null);
+        navigate("/");
       })
       .catch((e) => {
         // console.log(e);

@@ -92,7 +92,7 @@ const Post = ({
           </div>
         </div>
         <figure className="post-image">
-          <img className="w-full min-h-full" src={post_image} alt="" />
+          <img className="w-full h-full min-h-full" src={post_image} alt="" />
         </figure>
       </div>
       <DeletePopup

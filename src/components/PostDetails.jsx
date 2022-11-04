@@ -126,6 +126,27 @@ const PostDetails = () => {
       ],
     }).then(() => setIsLoading(false));
     getFollowingList();
+    const body = {
+      to: filterArticle[0].data.author_email,
+      from: "noreply.yasinmediumclone@gmail.com",
+      subject: "New Follower",
+      html: `<h1>New Follower</h1>
+        <h3>Dear ${filterArticle[0].data.author},</h3>
+        <h3>You have a new follower, people are loving your content, congrates on your achivement</h3>
+        <h3>Follower Name: ${authData.displayName}</h3>
+        <h3>Follower Email: ${authData.email}</h3>
+        <p>Thanks,</p>
+        <p>Yasin Medium Clone</p>`,
+    };
+    const options = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    };
+    fetch("https://yasin-medium-clone.herokuapp.com/sendEmail", options);
   };
 
   // Handle Unfollow
